@@ -3,15 +3,15 @@
 ; Toggle ON/OFF with F8
 
 toggle := false
-sensitivityMultiplier := 1.5  ; Увеличь до 1.7–2.0 если всё ещё слабо
+sensitivityMultiplier := 1.8  ; Увеличь до 1.7–2.0 если всё ещё слабо
 
 sprayPattern := Object()
 sprayPattern[0] := [-1, 5]
-sprayPattern[1] := [0, 5]
-sprayPattern[2] := [1, 5]
-sprayPattern[3] := [2, 5]
-sprayPattern[4] := [2, 5]
-sprayPattern[5] := [2, 4]
+sprayPattern[1] := [-1, 4.3]
+sprayPattern[2] := [-1, 3.5]
+sprayPattern[3] := [-1, 2.7]
+sprayPattern[4] := [-0.9, 2]
+sprayPattern[5] := [-0.7, 1.2]
 sprayPattern[6] := [1, 4]
 sprayPattern[7] := [-1, 4]
 sprayPattern[8] := [-2, 3]
