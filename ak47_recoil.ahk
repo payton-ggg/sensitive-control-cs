@@ -1,29 +1,52 @@
-﻿; ===== AK-47 Anti-Recoil Macro =====
+﻿; ===== AK-47 Anti-Recoil Macro for AutoHotkey v1 =====
 ; Sensitivity: 5.0
 ; Toggle ON/OFF with F8
 
 toggle := false
 
-; ===== Список смещений (XY) для 30 пуль =====
-sprayPattern := [
-    [-1, 5], [0, 5], [1, 5], [2, 5], [2, 5],
-    [2, 4], [1, 4], [-1, 4], [-2, 3], [-2, 3],
-    [-2, 3], [-1, 3], [0, 3], [1, 3], [2, 2],
-    [2, 2], [2, 2], [1, 2], [0, 2], [-1, 2],
-    [-2, 1], [-2, 1], [-2, 1], [-1, 1], [0, 1],
-    [1, 1], [1, 1], [1, 1], [0, 1], [-1, 1]
-]
+; ===== Паттерн отдачи AK-47 =====
+sprayPattern := Object()
+sprayPattern[0] := [-1, 5]
+sprayPattern[1] := [0, 5]
+sprayPattern[2] := [1, 5]
+sprayPattern[3] := [2, 5]
+sprayPattern[4] := [2, 5]
+sprayPattern[5] := [2, 4]
+sprayPattern[6] := [1, 4]
+sprayPattern[7] := [-1, 4]
+sprayPattern[8] := [-2, 3]
+sprayPattern[9] := [-2, 3]
+sprayPattern[10] := [-2, 3]
+sprayPattern[11] := [-1, 3]
+sprayPattern[12] := [0, 3]
+sprayPattern[13] := [1, 3]
+sprayPattern[14] := [2, 2]
+sprayPattern[15] := [2, 2]
+sprayPattern[16] := [2, 2]
+sprayPattern[17] := [1, 2]
+sprayPattern[18] := [0, 2]
+sprayPattern[19] := [-1, 2]
+sprayPattern[20] := [-2, 1]
+sprayPattern[21] := [-2, 1]
+sprayPattern[22] := [-2, 1]
+sprayPattern[23] := [-1, 1]
+sprayPattern[24] := [0, 1]
+sprayPattern[25] := [1, 1]
+sprayPattern[26] := [1, 1]
+sprayPattern[27] := [1, 1]
+sprayPattern[28] := [0, 1]
+sprayPattern[29] := [-1, 1]
 
-; ===== Активация по F8 =====
+; ===== Активация F8 =====
 F8::
     toggle := !toggle
-    if toggle
+    if (toggle)
         TrayTip, AK-47 Macro, Макрос ВКЛЮЧЕН (F8), 1
     else
         TrayTip, AK-47 Macro, Макрос ВЫКЛЮЧЕН (F8), 1
 return
 
-; ===== Макрос работает при зажатой ЛКМ =====
+; ===== Запуск при зажатой ЛКМ =====
 ~LButton::
     if (!toggle)
         return
@@ -34,20 +57,20 @@ return
         if (!GetKeyState("LButton", "P"))
             break
 
-        if (index >= sprayPattern.Length())
+        if (index >= 30)
             break
 
-        ; Масштабирование под sensitivity (коэф. 1.0 условный)
-        x := sprayPattern[index][1] * 1.0
-        y := sprayPattern[index][2] * 1.0
+        x := sprayPattern[index][1]
+        y := sprayPattern[index][2]
 
         MoveMouse(x, y)
-        Sleep(80)
+        Sleep, 80
         index++
     }
 return
 
-; ===== Движение мыши (безопасное API) =====
-MoveMouse(x, y) {
+; ===== Функция перемещения мыши =====
+MoveMouse(x, y)
+{
     DllCall("mouse_event", "UInt", 0x0001, "Int", x, "Int", y, "UInt", 0, "UInt", 0)
 }
