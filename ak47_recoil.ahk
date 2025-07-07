@@ -1,65 +1,53 @@
-﻿; AK-47 Recoil + AutoFire Macro — AHK v1
-; Sens: 4.899305 @ 800 DPI
-; F8: Toggle Recoil Control
-; F7: Toggle AutoFire for Semi-Auto Weapons
+﻿; ===== AK-47 Anti-Recoil Macro =====
+; Sensitivity: 5.0
+; Toggle ON/OFF with F8
 
-#NoEnv
-#SingleInstance, force
-SendMode Input
-SetTitleMatchMode, 2
-#IfWinActive Counter-Strike
+toggle := false
 
-; State toggles
-recoilEnabled := false
-autoFireEnabled := false
+; ===== Список смещений (XY) для 30 пуль =====
+sprayPattern := [
+    [-1, 5], [0, 5], [1, 5], [2, 5], [2, 5],
+    [2, 4], [1, 4], [-1, 4], [-2, 3], [-2, 3],
+    [-2, 3], [-1, 3], [0, 3], [1, 3], [2, 2],
+    [2, 2], [2, 2], [1, 2], [0, 2], [-1, 2],
+    [-2, 1], [-2, 1], [-2, 1], [-1, 1], [0, 1],
+    [1, 1], [1, 1], [1, 1], [0, 1], [-1, 1]
+]
 
-; Config
-recoilStrength := 4     ; Adjust for sensitivity
-recoilDelay := 30       ; Delay between recoil pulls
-autoFireDelay := 60     ; Delay between auto fire clicks (ms)
-
-; Toggle recoil on F8
+; ===== Активация по F8 =====
 F8::
-recoilEnabled := !recoilEnabled
-SoundBeep, % recoilEnabled ? 1000 : 600
-ToolTip % "Recoil: " (recoilEnabled ? "ON" : "OFF")
-SetTimer, RemoveTooltip, -1000
+    toggle := !toggle
+    if toggle
+        TrayTip, AK-47 Macro, Макрос ВКЛЮЧЕН (F8), 1
+    else
+        TrayTip, AK-47 Macro, Макрос ВЫКЛЮЧЕН (F8), 1
 return
 
-; Toggle autofire on F7
-F7::
-autoFireEnabled := !autoFireEnabled
-SoundBeep, % autoFireEnabled ? 1200 : 400
-ToolTip % "AutoFire: " (autoFireEnabled ? "ON" : "OFF")
-SetTimer, RemoveTooltip, -1000
-return
+; ===== Макрос работает при зажатой ЛКМ =====
+~LButton::
+    if (!toggle)
+        return
 
-; Main logic on LButton
-$*LButton::
-if (!recoilEnabled && !autoFireEnabled) {
-    Click
-    KeyWait, LButton
-    return
-}
+    index := 0
+    Loop
+    {
+        if (!GetKeyState("LButton", "P"))
+            break
 
-Click down
-while GetKeyState("LButton", "P")
-{
-    if (recoilEnabled) {
-        DllCall("mouse_event", "UInt", 0x01, "Int", 0, "Int", recoilStrength, "UInt", 0, "Int", 0)
-        Sleep %recoilDelay%
+        if (index >= sprayPattern.Length())
+            break
+
+        ; Масштабирование под sensitivity (коэф. 1.0 условный)
+        x := sprayPattern[index][1] * 1.0
+        y := sprayPattern[index][2] * 1.0
+
+        MoveMouse(x, y)
+        Sleep(80)
+        index++
     }
+return
 
-    if (autoFireEnabled) {
-        Click up
-        Sleep 15
-        Click down
-        Sleep %autoFireDelay%
-    }
+; ===== Движение мыши (безопасное API) =====
+MoveMouse(x, y) {
+    DllCall("mouse_event", "UInt", 0x0001, "Int", x, "Int", y, "UInt", 0, "UInt", 0)
 }
-Click up
-return
-
-RemoveTooltip:
-ToolTip
-return
