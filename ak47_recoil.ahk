@@ -1,10 +1,10 @@
-﻿; ===== AK-47 Anti-Recoil Macro for AutoHotkey v1 =====
+﻿; ===== AK-47 Anti-Recoil Macro (усиленный) =====
 ; Sensitivity: 5.0
 ; Toggle ON/OFF with F8
 
 toggle := false
+sensitivityMultiplier := 1.5  ; Увеличь до 1.7–2.0 если всё ещё слабо
 
-; ===== Паттерн отдачи AK-47 =====
 sprayPattern := Object()
 sprayPattern[0] := [-1, 5]
 sprayPattern[1] := [0, 5]
@@ -37,7 +37,6 @@ sprayPattern[27] := [1, 1]
 sprayPattern[28] := [0, 1]
 sprayPattern[29] := [-1, 1]
 
-; ===== Активация F8 =====
 F8::
     toggle := !toggle
     if (toggle)
@@ -46,7 +45,6 @@ F8::
         TrayTip, AK-47 Macro, Макрос ВЫКЛЮЧЕН (F8), 1
 return
 
-; ===== Запуск при зажатой ЛКМ =====
 ~LButton::
     if (!toggle)
         return
@@ -60,8 +58,11 @@ return
         if (index >= 30)
             break
 
-        x := sprayPattern[index][1]
-        y := sprayPattern[index][2]
+        rawX := sprayPattern[index][1]
+        rawY := sprayPattern[index][2]
+
+        x := Round(rawX * sensitivityMultiplier)
+        y := Round(rawY * sensitivityMultiplier)
 
         MoveMouse(x, y)
         Sleep, 80
@@ -69,7 +70,6 @@ return
     }
 return
 
-; ===== Функция перемещения мыши =====
 MoveMouse(x, y)
 {
     DllCall("mouse_event", "UInt", 0x0001, "Int", x, "Int", y, "UInt", 0, "UInt", 0)
