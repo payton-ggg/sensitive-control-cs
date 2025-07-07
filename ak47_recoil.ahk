@@ -1,29 +1,65 @@
-﻿; AK-47 Recoil Macro — под sensitivity = 4.899305 @ 800 DPI
-; AutoHotkey v1, Toggle: F8, Активен при удержании ЛКМ
+﻿; AK-47 Recoil + AutoFire Macro — AHK v1
+; Sens: 4.899305 @ 800 DPI
+; F8: Toggle Recoil Control
+; F7: Toggle AutoFire for Semi-Auto Weapons
 
-toggle := false
-~F8::toggle := !toggle
+#NoEnv
+#SingleInstance, force
+SendMode Input
+SetTitleMatchMode, 2
+#IfWinActive Counter-Strike
 
-~LButton::
-if (toggle)
+; State toggles
+recoilEnabled := false
+autoFireEnabled := false
+
+; Config
+recoilStrength := 4     ; Adjust for sensitivity
+recoilDelay := 30       ; Delay between recoil pulls
+autoFireDelay := 60     ; Delay between auto fire clicks (ms)
+
+; Toggle recoil on F8
+F8::
+recoilEnabled := !recoilEnabled
+SoundBeep, % recoilEnabled ? 1000 : 600
+ToolTip % "Recoil: " (recoilEnabled ? "ON" : "OFF")
+SetTimer, RemoveTooltip, -1000
+return
+
+; Toggle autofire on F7
+F7::
+autoFireEnabled := !autoFireEnabled
+SoundBeep, % autoFireEnabled ? 1200 : 400
+ToolTip % "AutoFire: " (autoFireEnabled ? "ON" : "OFF")
+SetTimer, RemoveTooltip, -1000
+return
+
+; Main logic on LButton
+$*LButton::
+if (!recoilEnabled && !autoFireEnabled) {
+    Click
+    KeyWait, LButton
+    return
+}
+
+Click down
+while GetKeyState("LButton", "P")
 {
-    yStrength := 1.9 ; усиление вертикального движения
-    xStrength := 1.5 ; лёгкое усиление бокового контроля
+    if (recoilEnabled) {
+        DllCall("mouse_event", "UInt", 0x01, "Int", 0, "Int", recoilStrength, "UInt", 0, "Int", 0)
+        Sleep %recoilDelay%
+    }
 
-    sprayX := [0, -1, -2, -3, -3, -2, -1, 1, 2, 3, 4, 3, 2, 1, 0, -1, -2, -3, -3, -2, -1, 0, 1, 2, 2, 1, 0, 0, -1, -1]
-    sprayY := [4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-
-    sprayLength := sprayX.Length()
-    i := 1
-
-    while GetKeyState("LButton", "P") and (i <= sprayLength)
-    {
-        xMove := sprayX[i] * xStrength
-        yMove := sprayY[i] * yStrength
-
-        DllCall("mouse_event", "UInt", 0x0001, "Int", xMove, "Int", yMove, "UInt", 0, "UPtr", 0)
-        Sleep, 75
-        i++
+    if (autoFireEnabled) {
+        Click up
+        Sleep 15
+        Click down
+        Sleep %autoFireDelay%
     }
 }
+Click up
+return
+
+RemoveTooltip:
+ToolTip
 return
